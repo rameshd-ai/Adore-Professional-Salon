@@ -63,5 +63,6 @@ sudo journalctl -u glamr-api -n 50 --no-pager
 |------|------|
 | `HOSTING_GCP.md` | End-to-end GCP VM provisioning |
 | `deploy/glamr-api.service` | systemd unit template — `sudo cp` to `/etc/systemd/system/glamr-api.service` |
+| `deploy/nginx-glamr.conf` | nginx site — `sudo cp` to `/etc/nginx/sites-available/glamr` |
 | `scripts/deploy-vm.sh` | Update deps, rebuild SPA, sync static files, restart API |
 | `.gitattributes` | Keeps `scripts/*.sh` with LF line endings for Linux |

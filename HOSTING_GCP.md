@@ -209,7 +209,32 @@ Use `--port 8000` internally; nginx terminates TLS and proxies to `127.0.0.1:800
 
 ## 9. nginx
 
-Create `/etc/nginx/sites-available/glamr`:
+**Create the site file before enabling it** — `sites-available/glamr` must exist, or `nginx -t` will fail.
+
+From the repo root (`export APP=/opt/glamr/app`), after `git pull`:
+
+```bash
+sudo cp "$APP/deploy/nginx-glamr.conf" /etc/nginx/sites-available/glamr
+sudo nano /etc/nginx/sites-available/glamr
+```
+
+Set **`server_name`** to your domain (or use `_` as a catch‑all on HTTP only until you have DNS — Let’s Encrypt still needs a real hostname).
+
+Enable and test:
+
+```bash
+sudo ln -sf /etc/nginx/sites-available/glamr /etc/nginx/sites-enabled/glamr
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+If Ubuntu’s default site steals port 80, disable it:
+
+```bash
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Inline reference (same as `deploy/nginx-glamr.conf`; includes `/health`):
 
 ```nginx
 server {
@@ -256,6 +281,12 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    location /health {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+
     location /uploads/ {
         proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
@@ -280,13 +311,6 @@ server {
         proxy_set_header Host $host;
     }
 }
-```
-
-Enable and test:
-
-```bash
-sudo ln -sf /etc/nginx/sites-available/glamr /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
 ```
 
 ## 10. HTTPS (Let’s Encrypt)
