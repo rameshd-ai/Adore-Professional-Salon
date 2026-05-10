@@ -14,17 +14,21 @@ Wait until it prints **`Deploy finished.`** If anything errors above that, fix i
 
 ## Right after deploy (catch API down early)
 
+`systemctl is-active` can say **`active`** even when nothing is listening on **8000** (crashing worker, wrong port in unit file). Always check the port and logs.
+
 ```bash
-sudo systemctl is-active glamr-api
+sudo systemctl status glamr-api --no-pager -l
+sudo ss -tlnp | grep 8000
 curl -sS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/api/settings
 ```
 
-First line should be **`active`**. Second should be **`200`**. If not:
+Last line should be **`200`**. If **`curl` fails** but status shows active:
 
 ```bash
-sudo journalctl -u glamr-api -n 60 --no-pager
-sudo systemctl restart glamr-api
+sudo journalctl -u glamr-api -n 80 --no-pager
 ```
+
+Typical fixes: **`User=`/`Group=`** in **`/etc/systemd/system/glamr-api.service`** must match who owns **`backend/.venv`** (often your SSH user, not **`www-data`**). After edits: **`sudo systemctl daemon-reload && sudo systemctl restart glamr-api`**.
 
 ## One-time per server (skip if already done)
 

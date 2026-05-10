@@ -38,4 +38,15 @@ sudo systemctl is-active --quiet "$SYSTEMD_SERVICE" || {
   exit 1
 }
 
-echo "Deploy finished."
+API_URL="${API_HEALTH_URL:-http://127.0.0.1:8000/api/settings}"
+echo "==> Wait for API on $API_URL"
+for _try in 1 2 3 4 5 6 7 8 9 10; do
+  if curl -sf -o /dev/null "$API_URL"; then
+    echo "Deploy finished."
+    exit 0
+  fi
+  sleep 1
+done
+echo "API still not responding (systemd may show active while uvicorn crashes — check logs):" >&2
+sudo journalctl -u "$SYSTEMD_SERVICE" -n 40 --no-pager >&2
+exit 1
