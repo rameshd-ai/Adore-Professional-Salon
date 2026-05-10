@@ -36,13 +36,19 @@ export function displayAddress(settings) {
   return (settings?.address || '').trim() || DEFAULT_ADDRESS
 }
 
-/** Google Maps embed: use lat/lng from DB when both set, else geocode by address text. */
+/**
+ * Google Maps iframe for Contact page.
+ * Plain ``output=embed`` URLs often show “Place info couldn't load” because Google tries to open a
+ * details panel without the Maps Embed API. ``iwloc=near`` + ``maps.google.com`` keeps a simple map view.
+ */
 export function mapEmbedSrc(settings) {
   const lat = (settings?.map_lat || '').trim()
   const lng = (settings?.map_lng || '').trim()
+  const tail = '&z=16&hl=en&output=embed&iwloc=near'
+  const base = 'https://maps.google.com/maps'
   if (lat && lng) {
     const q = encodeURIComponent(`${lat},${lng}`)
-    return `https://www.google.com/maps?q=${q}&z=16&output=embed`
+    return `${base}?q=${q}${tail}`
   }
-  return `https://www.google.com/maps?q=${encodeURIComponent(displayAddress(settings))}&output=embed`
+  return `${base}?q=${encodeURIComponent(displayAddress(settings))}${tail}`
 }
