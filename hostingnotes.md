@@ -37,7 +37,7 @@ Adjust branch/remotes as you use them.
 chmod +x scripts/deploy-vm.sh
 ```
 
-Ensure **`HOSTING_GCP.md`** steps are done once: packages, Node, clone location, `backend/.venv`, `backend/.env`, nginx, Let’s Encrypt (if using a domain), and the **`glamr-api`** systemd unit.
+Ensure **`HOSTING_GCP.md`** steps are done once: packages, Node, clone location, `backend/.venv`, `backend/.env`, **`deploy/glamr-api.service`** copied to `/etc/systemd/system/` (see §8), nginx, Let’s Encrypt (if using a domain).
 
 ---
 
@@ -62,5 +62,6 @@ sudo journalctl -u glamr-api -n 50 --no-pager
 | Item | Role |
 |------|------|
 | `HOSTING_GCP.md` | End-to-end GCP VM provisioning |
+| `deploy/glamr-api.service` | systemd unit template — `sudo cp` to `/etc/systemd/system/glamr-api.service` |
 | `scripts/deploy-vm.sh` | Update deps, rebuild SPA, sync static files, restart API |
 | `.gitattributes` | Keeps `scripts/*.sh` with LF line endings for Linux |

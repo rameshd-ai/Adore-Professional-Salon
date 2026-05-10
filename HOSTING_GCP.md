@@ -25,8 +25,10 @@ Create an **A record** for your domain (e.g. `yourdomain.com` and `www`) to the 
 
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y nginx certbot python3-certbot-nginx git
+sudo apt install -y nginx certbot python3-certbot-nginx git python3-venv rsync
 ```
+
+If `python3 -m venv` still complains about `ensurepip`, install the matching package (e.g. `sudo apt install -y python3.11-venv`).
 
 Install Node.js 20+ (for building the frontend once), for example via [NodeSource](https://github.com/nodesource/distributions) or `nvm`.
 
@@ -36,7 +38,7 @@ Install Node.js 20+ (for building the frontend once), for example via [NodeSourc
 sudo mkdir -p /opt/glamr
 sudo chown "$USER:$USER" /opt/glamr
 cd /opt/glamr
-git clone https://github.com/YOUR_ORG/YOUR_REPO.git app
+git clone https://github.com/rameshd-ai/Adore-Professional-Salon.git app
 ```
 
 Use the directory that contains **`backend/`** and **`frontend/`**:
@@ -93,11 +95,38 @@ If the site and API share one domain, leave `VITE_API_URL` empty so the browser 
 
 ## 8. systemd unit for uvicorn
 
-Create `/etc/systemd/system/glamr-api.service`:
+This keeps the API running after logout/reboot. It listens on **`127.0.0.1:8000`** only; nginx (§9) proxies `/api`, `/admin`, etc. to that port.
 
-```ini
+### Before you start
+
+1. **`$APP/backend/.env` exists** (§6) — at least `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SESSION_SECRET`, and `CORS_ORIGINS` for your real site URL. SQLite: leave `DATABASE_URL` unset.
+2. **Manual check** (proves venv + app work):
+
+   ```bash
+   cd /opt/glamr/app/backend
+   source .venv/bin/activate
+   uvicorn app.main:app --host 127.0.0.1 --port 8000
+   ```
+
+   Press Ctrl+C after you see it start; if this fails, fix errors before systemd.
+
+### Install the unit file
+
+From the repo root on the VM (adjust `/opt/glamr/app` if your clone path differs):
+
+```bash
+export APP=/opt/glamr/app
+cd "$APP"
+git pull   # ensures deploy/glamr-api.service exists if we added it after your first clone
+sudo cp "$APP/deploy/glamr-api.service" /etc/systemd/system/glamr-api.service
+```
+
+If **`cp` fails** (`No such file or directory`), either pull failed or your branch never got `deploy/`. Create the unit file directly (paths assume `/opt/glamr/app/backend` — edit if needed):
+
+```bash
+sudo tee /etc/systemd/system/glamr-api.service << 'EOF'
 [Unit]
-Description=Glamr FastAPI (uvicorn)
+Description=Adore salon FastAPI (uvicorn)
 After=network.target
 
 [Service]
@@ -112,14 +141,60 @@ RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
+EOF
 ```
 
+If your app lives somewhere other than `/opt/glamr/app/backend`, edit `WorkingDirectory`, `EnvironmentFile`, and `ExecStart` in that file (`sudo nano /etc/systemd/system/glamr-api.service`).
+
+### Permissions: pick **one** approach
+
+**A — Simplest (recommended if `www-data` permission errors):** edit the unit so the service runs as **your SSH login user** (the user that owns `backend/.venv`):
+
 ```bash
-sudo chown -R www-data:www-data /opt/glamr/app/backend/uploads /opt/glamr/app/backend/glamr.db 2>/dev/null || true
+sudo nano /etc/systemd/system/glamr-api.service
+# Set User= and Group= to your username (e.g. dramesh2610), save, then:
+sudo systemctl daemon-reload
+sudo systemctl restart glamr-api
+```
+
+**B — Traditional (`User=www-data`):** the API user must read `.venv`, read `.env`, and write SQLite + uploads:
+
+```bash
+export APP=/opt/glamr/app
+sudo mkdir -p "$APP/backend/uploads"
+sudo touch "$APP/backend/glamr.db" 2>/dev/null || true
+sudo chown -R www-data:www-data "$APP/backend/uploads" "$APP/backend/glamr.db"
+sudo chown www-data:www-data "$APP/backend/.env"
+sudo chmod 640 "$APP/backend/.env"
+# So SQLite can create/update the DB file:
+sudo chown www-data:www-data "$APP/backend"
+```
+
+Ensure others can traverse directories to `.venv` (default `755` on `/opt/glamr/app` paths is usually enough). If it still fails, use approach **A**.
+
+### Enable and verify
+
+```bash
 sudo systemctl daemon-reload
 sudo systemctl enable --now glamr-api
 sudo systemctl status glamr-api
 ```
+
+Quick API check from the VM:
+
+```bash
+curl -sS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/docs
+```
+
+You should see `200`.
+
+### If it fails
+
+```bash
+sudo journalctl -u glamr-api -n 80 --no-pager
+```
+
+Common messages: missing `.env`, bad path to `.venv`, SQLite cannot write `glamr.db`, or `Permission denied` on the venv — fix with approach **A** or **B** above.
 
 Use `--port 8000` internally; nginx terminates TLS and proxies to `127.0.0.1:8000`.
 
