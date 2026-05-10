@@ -135,7 +135,7 @@ User=www-data
 Group=www-data
 WorkingDirectory=/opt/glamr/app/backend
 EnvironmentFile=-/opt/glamr/app/backend/.env
-ExecStart=/opt/glamr/app/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --proxy-headers
+ExecStart=/opt/glamr/app/backend/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --proxy-headers
 Restart=always
 RestartSec=5
 
@@ -195,6 +195,15 @@ sudo journalctl -u glamr-api -n 80 --no-pager
 ```
 
 Common messages: missing `.env`, bad path to `.venv`, SQLite cannot write `glamr.db`, or `Permission denied` on the venv — fix with approach **A** or **B** above.
+
+**`Failed to run 'start' task: No such file or directory`:** often the venv **`python`** or **`uvicorn`** path is wrong. The shipped unit uses **`python -m uvicorn`** (more reliable than calling the `uvicorn` script). Verify on the VM:
+
+```bash
+ls -la /opt/glamr/app/backend/.venv/bin/python /opt/glamr/app/backend/.venv/bin/python3
+/opt/glamr/app/backend/.venv/bin/python -m uvicorn --help >/dev/null && echo OK
+```
+
+If only `python3` exists in `.venv/bin/`, edit `ExecStart=` to use `.../bin/python3 -m uvicorn ...`.
 
 Use `--port 8000` internally; nginx terminates TLS and proxies to `127.0.0.1:8000`.
 
