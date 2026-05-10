@@ -1,0 +1,52 @@
+{# Visit create/edit only: enhance Services billed with Select2 (jQuery + select2 already in sqladmin base). #}
+<style>
+  /* Scoped to visit form multi-select only — does not target other admin selects */
+  .visit-services-select2-wrap .select2-container { z-index: 10055; }
+  .visit-services-select2-wrap .select2-container--default .select2-selection--multiple {
+    min-height: 46px;
+    border-radius: 0;
+    border-color: var(--bs-border-color, #e4e6ef);
+  }
+</style>
+<script>
+(function ($) {
+  'use strict';
+  if (!$ || !$.fn.select2) return;
+  $(function () {
+    var $el = $('select[name="visit_services"]');
+    if (!$el.length || !$el.prop('multiple')) return;
+    $el.addClass('visit-services-multiselect');
+
+    var $col = $el.closest('.col-sm-10');
+    if ($col.length) $col.addClass('visit-services-select2-wrap');
+
+    var $parent = $el.closest('#kt_app_content');
+    if (!$parent.length) $parent = $(document.body);
+
+    if ($el.hasClass('select2-hidden-accessible')) {
+      try {
+        $el.select2('destroy');
+      } catch (e) { /* ignore */ }
+    }
+
+    $el.select2({
+      width: '100%',
+      placeholder: 'Search or select services…',
+      closeOnSelect: false,
+      allowClear: false,
+      dropdownParent: $parent,
+    });
+
+    function clearSearchTyping() {
+      var $box = $el.next('.select2-container');
+      if (!$box.length) return;
+      $box.find('.select2-search__field').val('');
+      $box.find('.select2-search__field').trigger('input');
+    }
+
+    $el.on('select2:select', function () {
+      setTimeout(clearSearchTyping, 0);
+    });
+  });
+})(window.jQuery);
+</script>

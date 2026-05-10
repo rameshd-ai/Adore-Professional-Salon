@@ -1,0 +1,70 @@
+{# Metronic toolbar filter panel (Saul apps/customers/list). Expects model_view, request. #}
+<div class="px-7 py-5 border-bottom border-gray-200">
+  <div class="fs-5 text-gray-800 fw-bold">Filter options</div>
+</div>
+<div class="separator border-gray-200"></div>
+<div class="px-7 py-5 sqladmin-filter-menu-body">
+  {% for filter in model_view.get_filters() %}
+  {% if filter.has_operator %}
+  <div class="mb-8">
+    <label class="form-label fs-6 fw-semibold mb-3">{{ filter.title }}</label>
+    {% set current_filter = request.query_params.get(filter.parameter_name, '') %}
+    {% set current_op = request.query_params.get(filter.parameter_name + '_op', '') %}
+    {% if current_filter %}
+    <div class="mb-3 text-gray-600 fs-7">
+      Active: {{ current_op }} {{ current_filter }}
+      <a href="{{ request.url.remove_query_params(filter.parameter_name).remove_query_params(filter.parameter_name + '_op') }}"
+        class="text-primary text-hover-primary">Clear</a>
+    </div>
+    {% endif %}
+    <form method="get" class="d-flex flex-column gap-3">
+      {% for key, value in request.query_params.items() %}
+      {% if key != filter.parameter_name and key != filter.parameter_name + '_op' %}
+      <input type="hidden" name="{{ key }}" value="{{ value }}">
+      {% endif %}
+      {% endfor %}
+      <select name="{{ filter.parameter_name }}_op" class="form-select form-select-solid form-select-sm" required>
+        <option value="">Operation…</option>
+        {% for op_value, op_label in filter.get_operation_options_for_model(model_view.model) %}
+        <option value="{{ op_value }}" {% if current_op == op_value %}selected{% endif %}>{{ op_label }}</option>
+        {% endfor %}
+      </select>
+      <input type="text" name="{{ filter.parameter_name }}" placeholder="Value"
+        class="form-control form-control-solid form-control-sm" value="{{ current_filter }}" required>
+      <button type="submit" class="btn btn-sm btn-primary align-self-end">Apply</button>
+    </form>
+  </div>
+  {% else %}
+  <div class="mb-8">
+    <div class="fs-6 fw-semibold text-gray-800 mb-3">{{ filter.title }}</div>
+    <div class="d-flex flex-column gap-1">
+      {% for lookup in filter.lookups(request, model_view.model, model_view._run_arbitrary_query) %}
+      {% if request.query_params.get(filter.parameter_name) == lookup[0] %}
+      <div class="d-flex align-items-center justify-content-between bg-light-primary rounded px-3 py-2">
+        <span class="text-gray-800 fw-semibold text-truncate">{{ lookup[1] }}</span>
+        <a href="{{ request.url.remove_query_params(filter.parameter_name) }}" class="text-gray-600 ms-2" title="Clear"><i
+            class="fa-solid fa-times"></i></a>
+      </div>
+      {% else %}
+      <a href="{{ request.url.include_query_params(**{filter.parameter_name: lookup[0]}) }}"
+        class="d-block text-gray-700 text-hover-primary text-truncate py-2 px-3 rounded-2 sqladmin-filter-link">{{
+        lookup[1] }}</a>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+  <div class="separator border-gray-200 my-2"></div>
+  <div class="d-flex justify-content-end pt-3">
+    {% set ns = namespace(u=request.url) %}
+    {% for f in model_view.get_filters() %}
+    {% if f.has_operator %}
+    {% set ns.u = ns.u.remove_query_params([f.parameter_name, f.parameter_name + '_op']) %}
+    {% else %}
+    {% set ns.u = ns.u.remove_query_params(f.parameter_name) %}
+    {% endif %}
+    {% endfor %}
+    <a href="{{ ns.u }}" class="btn btn-sm btn-light btn-active-light-primary">Reset all</a>
+  </div>
+</div>

@@ -1,0 +1,818 @@
+/**
+ * Glamr Studio admin — dark sidebar + light content shell (custom CSS only).
+ * Typography: system UI stack; scripts/styles are local to this app.
+ */
+:root {
+  --gs-primary: #1b84ff;
+  --gs-primary-hover: #056ee9;
+  --gs-primary-active: #006ae6;
+  --gs-primary-soft: rgba(27, 132, 255, 0.25);
+  --gs-primary-softer: rgba(27, 132, 255, 0.08);
+  /* Light main column (dashboard-style) */
+  --gs-bg: #f1f1f4;
+  --gs-body: #ffffff;
+  --gs-surface: #ffffff;
+  --gs-surface-raised: #f9f9f9;
+  --gs-toolbar: #ffffff;
+  --gs-border: #eff2f5;
+  --gs-border-strong: #e4e6ef;
+  --gs-border-dash: #dbdfe9;
+  --gs-text: #252f4a;
+  --gs-text-muted: #99a1b7;
+  --gs-text-heading: #99a1b7;
+  --gs-success: #17c653;
+  --gs-danger: #f8285a;
+  --gs-card-shadow: 0px 10px 30px 0px rgba(82, 63, 105, 0.05);
+  --gs-sidebar-w: 265px;
+  --gs-radius: 0.475rem;
+  --gs-radius-lg: 0.625rem;
+  --gs-topbar-h: 70px;
+  --gs-sidebar-bg: #0d0e12;
+  --gs-sidebar-icon: #464852;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  background: var(--gs-bg) !important;
+  color: var(--gs-text) !important;
+  color-scheme: light;
+}
+
+/* —— Login —— */
+.glamr-login {
+  background: radial-gradient(ellipse 120% 80% at 50% 0%, #1c1c21 0%, var(--gs-bg) 55%);
+}
+
+.glamr-login-card {
+  box-shadow: var(--gs-card-shadow);
+  border-radius: var(--gs-radius-lg) !important;
+  border: 1px solid var(--gs-border) !important;
+  background: var(--gs-surface) !important;
+}
+
+.glamr-login-title,
+.glamr-login-label {
+  color: var(--gs-text) !important;
+}
+
+.glamr-login-sub {
+  color: var(--gs-text-muted) !important;
+}
+
+.glamr-login .form-control {
+  background: var(--gs-body) !important;
+  border-color: var(--gs-border-strong) !important;
+  color: var(--gs-text) !important;
+  border-radius: var(--gs-radius);
+}
+
+.glamr-login .form-control::placeholder {
+  color: #9a9cae;
+}
+
+.glamr-login-mark {
+  width: 48px;
+  height: 48px;
+  font-size: 1.25rem;
+  background: linear-gradient(135deg, var(--gs-primary) 0%, var(--gs-primary-active) 100%);
+  box-shadow: 0 8px 24px rgba(27, 132, 255, 0.35);
+}
+
+.glamr-login .btn-primary,
+.glamr-login-submit {
+  background: var(--gs-primary) !important;
+  border-color: var(--gs-primary) !important;
+  border-radius: var(--gs-radius);
+  font-weight: 600;
+  box-shadow: 0 4px 18px rgba(27, 132, 255, 0.3);
+}
+
+.glamr-login .btn-primary:hover,
+.glamr-login-submit:hover {
+  background: var(--gs-primary-hover) !important;
+  border-color: var(--gs-primary-hover) !important;
+}
+
+/* —— App shell —— */
+.glamr-studio {
+  display: flex;
+  min-height: 100vh;
+  align-items: stretch;
+  font-size: 13px;
+}
+
+.gs-sidebar {
+  /* Local tokens: sidebar stays dark while main app uses light :root */
+  --gs-text: #f5f5f5;
+  --gs-text-muted: #9a9cae;
+  --gs-text-heading: #636674;
+  --gs-surface-raised: #1c1c21;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  width: var(--gs-sidebar-w);
+  min-width: var(--gs-sidebar-w);
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--gs-sidebar-bg) !important;
+  border-right: 0;
+  box-shadow: none;
+  z-index: 1020;
+  scrollbar-color: transparent transparent;
+}
+
+.gs-sidebar:hover {
+  scrollbar-color: #232630 transparent;
+}
+
+.gs-sidebar::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.gs-sidebar:hover::-webkit-scrollbar-thumb {
+  background: #232630;
+}
+
+.gs-sidebar-brand {
+  border-bottom: 1px dashed #1f212a;
+}
+
+.gs-brand-link {
+  color: var(--gs-text) !important;
+}
+
+.gs-brand-mark {
+  width: 42px;
+  height: 42px;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, var(--gs-primary) 0%, var(--gs-primary-active) 100%);
+  box-shadow: 0 6px 20px rgba(27, 132, 255, 0.25);
+}
+
+.gs-brand-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--gs-text) !important;
+}
+
+.gs-brand-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--gs-text-heading) !important;
+  text-transform: uppercase;
+}
+
+.gs-sidebar-foot {
+  border-top: 1px dashed #1f212a;
+}
+
+.glamr-studio .gs-sidebar .gs-btn-outline {
+  color: var(--gs-text-muted) !important;
+  border: 1px solid #363843 !important;
+  border-radius: var(--gs-radius);
+  background: transparent !important;
+}
+
+.glamr-studio .gs-sidebar .gs-btn-outline:hover {
+  color: var(--gs-text) !important;
+  border-color: var(--gs-text-muted) !important;
+  background: var(--gs-surface-raised) !important;
+}
+
+/* Sidebar footer sign-out button */
+.gs-sidebar-foot .gs-btn-outline {
+  color: #b5b5c3 !important;
+  border: 0 !important;
+  background: rgba(63, 66, 84, 0.35) !important;
+}
+
+.gs-sidebar-foot .gs-btn-outline:hover {
+  color: #b5b5c3 !important;
+  background: rgba(63, 66, 84, 0.35) !important;
+}
+
+.glamr-studio .gs-sidebar .navbar-toggler {
+  border-color: #363843;
+  padding: 0.35rem 0.55rem;
+}
+
+.glamr-studio .gs-sidebar .navbar-toggler-icon {
+  filter: invert(1) opacity(0.75);
+}
+
+/* Sidebar nav (SQLAdmin display_menu → .navbar-nav) */
+.glamr-studio .gs-sidebar .navbar-nav {
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.glamr-studio .gs-sidebar .nav-link {
+  position: relative;
+  color: var(--gs-text-muted) !important;
+  border-radius: var(--gs-radius);
+  padding: 0.55rem 0.85rem;
+  font-weight: 600;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.glamr-studio .gs-sidebar .nav-link:hover,
+.glamr-studio .gs-sidebar .nav-link:focus {
+  color: var(--gs-text) !important;
+  background: transparent !important;
+}
+
+.glamr-studio .gs-sidebar .nav-link.active {
+  color: var(--gs-text) !important;
+  background: var(--gs-surface-raised) !important;
+}
+
+.glamr-studio .gs-sidebar .nav-link-icon {
+  color: var(--gs-sidebar-icon);
+  margin-right: 0.5rem;
+}
+
+.glamr-studio .gs-sidebar .nav-link:hover .nav-link-icon,
+.glamr-studio .gs-sidebar .nav-link:focus .nav-link-icon {
+  color: var(--gs-text);
+}
+
+.glamr-studio .gs-sidebar .nav-link.active .nav-link-icon {
+  color: var(--gs-text);
+}
+
+.glamr-studio .gs-sidebar .nav-item.dropdown {
+  width: 100%;
+}
+
+.glamr-studio .gs-sidebar .dropdown-toggle::after {
+  margin-left: auto;
+  opacity: 0.5;
+}
+
+.glamr-studio .gs-sidebar .dropdown-menu {
+  position: static !important;
+  transform: none !important;
+  float: none;
+  width: 100%;
+  margin: 0.35rem 0 0;
+  padding: 0.35rem 0;
+  background: var(--gs-sidebar-bg) !important;
+  border: 0 !important;
+  border-radius: var(--gs-radius);
+  box-shadow: none;
+}
+
+.glamr-studio .gs-sidebar .dropdown-menu .nav-link {
+  padding-left: 2rem;
+  font-size: 0.9rem;
+}
+
+.glamr-studio .gs-sidebar .dropdown-toggle.nav-link {
+  color: var(--gs-text-muted) !important;
+}
+
+/* Main column */
+.gs-shell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--gs-bg);
+}
+
+.gs-topbar {
+  min-height: var(--gs-topbar-h);
+  background: #ffffff;
+  border-bottom: 1px solid var(--gs-border);
+  box-shadow: 0px 10px 30px 0px rgba(82, 63, 105, 0.05);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1010;
+}
+
+.gs-topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.65rem 1.25rem;
+}
+
+.gs-topbar-spacer {
+  flex: 1;
+}
+
+.gs-topbar-search {
+  flex: 1;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.35rem 0.85rem;
+  background: #f9f9f9;
+  border: 1px solid var(--gs-border-strong);
+  border-radius: var(--gs-radius);
+}
+
+.gs-search-icon {
+  color: var(--gs-text-muted);
+  font-size: 0.9rem;
+}
+
+.gs-search-input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--gs-text);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.gs-search-input::placeholder {
+  color: var(--gs-text-muted);
+  opacity: 0.8;
+}
+
+.gs-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.gs-topbar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gs-success);
+  opacity: 0.85;
+}
+
+.gs-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--gs-radius);
+  border: 0;
+  background: transparent;
+  color: var(--gs-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+}
+
+.gs-icon-btn:not(:disabled):hover {
+  color: var(--gs-text);
+  background: rgba(37, 47, 74, 0.06);
+}
+
+.gs-icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.gs-user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.65rem 0.35rem 0.35rem;
+  border-radius: var(--gs-radius);
+  border: 1px solid var(--gs-border-strong);
+  background: #ffffff;
+  color: var(--gs-text) !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.gs-user-btn::after {
+  margin-left: 0.15rem;
+  opacity: 0.5;
+}
+
+.gs-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--gs-radius);
+  background: var(--gs-primary-soft);
+  color: var(--gs-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.gs-dropdown-menu {
+  background: #ffffff !important;
+  border: 1px solid var(--gs-border-strong) !important;
+  box-shadow: 0px 0px 50px 0px rgba(82, 63, 105, 0.12);
+  border-radius: var(--gs-radius);
+  padding: 0.35rem;
+  min-width: 180px;
+}
+
+.gs-dropdown-menu .dropdown-item {
+  border-radius: calc(var(--gs-radius) - 2px);
+}
+
+/* Page heading — light toolbar strip under header */
+.gs-page-head {
+  padding: 1.1rem 1.25rem 1rem;
+  margin-bottom: 0;
+  background: #ffffff;
+  border-top: 0;
+  border-bottom: 1px dashed var(--gs-border-dash);
+}
+
+.gs-breadcrumb {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--gs-text-muted) !important;
+  margin-bottom: 0.35rem;
+}
+
+.gs-bc-sep {
+  margin: 0 0.35rem;
+  opacity: 0.45;
+}
+
+.gs-bc-current {
+  color: var(--gs-text) !important;
+}
+
+.gs-page-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--gs-text) !important;
+  margin: 0;
+}
+
+.gs-page-subtitle {
+  color: var(--gs-text-muted) !important;
+  font-size: 0.875rem;
+  margin: 0.35rem 0 0;
+}
+
+.gs-main {
+  flex: 1;
+}
+
+.gs-main-inner {
+  padding-top: 0.5rem;
+}
+
+/* —— Tabler / SQLAdmin components —— */
+.glamr-studio .card {
+  border: 1px solid var(--gs-border) !important;
+  box-shadow: var(--gs-card-shadow);
+  border-radius: var(--gs-radius-lg);
+  background: var(--gs-surface) !important;
+  color: var(--gs-text);
+}
+
+.glamr-studio .card-header {
+  background: var(--gs-surface) !important;
+  border-bottom: 1px solid var(--gs-border) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .card-title {
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .card-body {
+  color: var(--gs-text);
+  background: var(--gs-surface);
+}
+
+.glamr-studio .card-body.border-bottom {
+  border-color: var(--gs-border) !important;
+}
+
+/* List toolbar: search input group */
+.glamr-studio .card-body.border-bottom .input-group {
+  border-radius: var(--gs-radius);
+  overflow: hidden;
+}
+
+.glamr-studio .card-body.border-bottom .input-group .form-control {
+  border-color: var(--gs-border-strong) !important;
+  background: var(--gs-body) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .card-body.border-bottom .input-group .btn {
+  border-color: var(--gs-border-strong) !important;
+  background: var(--gs-surface-raised) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .card-body.border-bottom .input-group .btn:hover {
+  background: #e4e6ef !important;
+  color: var(--gs-text) !important;
+}
+
+/* Pagination footer — kill default light Tabler footer */
+.glamr-studio .card-footer {
+  background: var(--gs-surface-raised) !important;
+  border-top: 1px solid var(--gs-border) !important;
+  color: var(--gs-text-muted) !important;
+  border-radius: 0 0 var(--gs-radius-lg) var(--gs-radius-lg) !important;
+}
+
+.glamr-studio .card-footer .text-muted {
+  color: var(--gs-text-muted) !important;
+}
+
+.glamr-studio .card-footer .pagination .page-link {
+  border-radius: var(--gs-radius);
+  border-color: var(--gs-border-strong) !important;
+  background: var(--gs-surface) !important;
+  color: var(--gs-text) !important;
+  font-size: 0.8125rem;
+}
+
+.glamr-studio .card-footer .pagination .page-link:hover {
+  background: var(--gs-body) !important;
+  color: var(--gs-primary) !important;
+}
+
+.glamr-studio .card-footer .pagination .page-item.active .page-link {
+  background: var(--gs-primary) !important;
+  border-color: var(--gs-primary) !important;
+  color: #fff !important;
+}
+
+.glamr-studio .card-footer .pagination .page-item.disabled .page-link {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.glamr-studio .card-footer .btn-light,
+.glamr-studio .card-footer .btn-sm.btn-light {
+  background: var(--gs-surface) !important;
+  border-color: var(--gs-border-strong) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .card-footer .dropdown-menu {
+  background: var(--gs-surface) !important;
+  border: 1px solid var(--gs-border) !important;
+}
+
+/* Table */
+.glamr-studio .table {
+  color: var(--gs-text) !important;
+  --bs-table-color: var(--gs-text);
+}
+
+.glamr-studio .table thead th {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gs-text-heading) !important;
+  border-bottom: 1px solid var(--gs-border) !important;
+  background: var(--gs-surface-raised) !important;
+  vertical-align: middle;
+}
+
+/* Sort links: not loud primary by default */
+.glamr-studio .table thead th a {
+  color: inherit !important;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.glamr-studio .table thead th a:hover {
+  color: var(--gs-primary) !important;
+}
+
+.glamr-studio .table tbody td {
+  color: var(--gs-text) !important;
+  border-color: var(--gs-border) !important;
+}
+
+.glamr-studio .table tbody tr:hover {
+  background: var(--gs-primary-softer) !important;
+}
+
+/* Row action icons */
+.glamr-studio .table td.text-end a {
+  color: var(--gs-text-muted) !important;
+  text-decoration: none;
+}
+
+.glamr-studio .table td.text-end a:hover {
+  color: var(--gs-primary) !important;
+}
+
+.glamr-studio .text-muted {
+  color: var(--gs-text-muted) !important;
+}
+
+.glamr-studio .btn-primary {
+  background: var(--gs-primary) !important;
+  border-color: var(--gs-primary) !important;
+  border-radius: var(--gs-radius);
+  font-weight: 600;
+}
+
+.glamr-studio .btn-primary:hover,
+.glamr-studio .btn-primary:focus {
+  background: var(--gs-primary-hover) !important;
+  border-color: var(--gs-primary-hover) !important;
+}
+
+.glamr-studio .btn-secondary,
+.glamr-studio .btn-light {
+  border-radius: var(--gs-radius);
+  background: var(--gs-surface-raised) !important;
+  border-color: var(--gs-border-strong) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .btn-secondary:hover,
+.glamr-studio .btn-light:hover {
+  background: #e4e6ef !important;
+  border-color: #d4d7e5 !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .btn-outline-secondary {
+  color: var(--gs-text-muted) !important;
+  border-color: var(--gs-border-strong) !important;
+}
+
+.glamr-studio .btn-outline-secondary:hover {
+  background: var(--gs-surface-raised) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .form-label,
+.glamr-studio label.form-label {
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .form-control,
+.glamr-studio .form-select {
+  border-radius: var(--gs-radius);
+  border-color: var(--gs-border-strong) !important;
+  background: var(--gs-body) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .form-control::placeholder {
+  color: var(--gs-text-muted);
+}
+
+.glamr-studio .form-control:focus,
+.glamr-studio .form-select:focus {
+  border-color: var(--gs-primary) !important;
+  box-shadow: 0 0 0 0.2rem var(--gs-primary-soft);
+  background: var(--gs-body) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio textarea.form-control {
+  background: var(--gs-body) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .form-check-input {
+  background-color: var(--gs-body);
+  border-color: var(--gs-border-strong);
+}
+
+.glamr-studio .form-check-input:checked {
+  background-color: var(--gs-primary);
+  border-color: var(--gs-primary);
+}
+
+.glamr-studio .badge {
+  border-radius: var(--gs-radius);
+  border: 1px solid var(--gs-border);
+}
+
+.glamr-studio .pagination .page-link {
+  border-radius: var(--gs-radius);
+  border-color: var(--gs-border-strong) !important;
+  background: var(--gs-surface) !important;
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .pagination .page-link:hover {
+  background: var(--gs-surface-raised) !important;
+  color: var(--gs-primary) !important;
+}
+
+.glamr-studio .pagination .page-item.active .page-link {
+  background: var(--gs-primary) !important;
+  border-color: var(--gs-primary) !important;
+}
+
+.glamr-studio .dropdown-menu {
+  background: var(--gs-surface) !important;
+  border: 1px solid var(--gs-border-strong) !important;
+  box-shadow: 0px 0px 50px 0px rgba(82, 63, 105, 0.12);
+}
+
+.glamr-studio .dropdown-item {
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .dropdown-item:hover {
+  background: var(--gs-surface-raised) !important;
+}
+
+.glamr-studio .alert {
+  border-radius: var(--gs-radius);
+}
+
+.glamr-studio .modal-content {
+  background: var(--gs-surface) !important;
+  border: 1px solid var(--gs-border);
+  color: var(--gs-text);
+}
+
+.glamr-studio .modal-header,
+.glamr-studio .modal-footer {
+  border-color: var(--gs-border) !important;
+}
+
+/* Body links: primary accent; table sort/row icons overridden above */
+.glamr-studio a:not(.btn):not(.nav-link):not(.dropdown-item):not(.page-link):not(.gs-brand-link) {
+  color: var(--gs-primary);
+}
+
+.glamr-studio a:not(.btn):not(.nav-link):not(.dropdown-item):not(.page-link):not(.gs-brand-link):hover {
+  color: var(--gs-primary-hover);
+}
+
+.glamr-studio .btn-close {
+  filter: none;
+  opacity: 0.45;
+}
+
+.glamr-studio .btn-close:hover {
+  opacity: 0.75;
+}
+
+.glamr-studio .select2-container--default .select2-selection--single {
+  background: var(--gs-body) !important;
+  border-color: var(--gs-border-strong) !important;
+}
+
+.glamr-studio .select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .select2-dropdown {
+  background: var(--gs-surface) !important;
+  border-color: var(--gs-border) !important;
+}
+
+.glamr-studio .select2-results__option {
+  color: var(--gs-text) !important;
+}
+
+.glamr-studio .select2-results__option--highlighted {
+  background: var(--gs-primary-soft) !important;
+}
+
+.glamr-studio .is-invalid {
+  border-color: var(--gs-danger) !important;
+}
+
+.glamr-studio .invalid-feedback {
+  color: var(--gs-danger) !important;
+}
+
+@media (max-width: 767.98px) {
+  .glamr-studio {
+    flex-direction: column;
+  }
+
+  .gs-sidebar {
+    position: relative;
+    width: 100%;
+    min-width: 100%;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid #e4e6ef;
+  }
+
+  .gs-topbar-inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

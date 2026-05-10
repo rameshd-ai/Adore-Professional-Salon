@@ -1,0 +1,4 @@
+# The application runs from `backend/`. Install dependencies with:
+#   cd backend && pip install -r requirements.txt
+#
+# This file is a pointer for anyone who runs `pip install -r requirements.txt` at repo root.

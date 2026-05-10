@@ -1,0 +1,71 @@
+/**
+ * SQLAdmin inside Saul HTML Free (sidebar uses Metronic menu markup).
+ */
+#kt_app_sidebar_main .menu .menu-icon i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* SQLAdmin cards/tables: keep readable inside Saul */
+#kt_app_content_container .card {
+  box-shadow: var(--bs-box-shadow-sm, 0 0.1rem 1rem rgba(0, 0, 0, 0.05));
+}
+
+/* List table (Saul customers list style) */
+#kt_admin_list_table tbody tr:hover {
+  background-color: rgba(76, 87, 125, 0.04);
+}
+
+a.sqladmin-filter-link:hover {
+  background-color: var(--bs-gray-100, #f9f9f9);
+}
+
+/* SQLAdmin edit/create: help text + file inputs inside themed forms */
+#kt_app_content_container .form-fieldset .form-control[type="file"] {
+  padding: 0.55rem 0.75rem;
+}
+
+#kt_app_content_container .form-fieldset textarea.form-control {
+  min-height: 5rem;
+}
+
+#kt_app_content_container .form-fieldset .col-form-label {
+  font-weight: 600;
+  color: var(--bs-gray-800, #252f4a);
+}
+
+/* List: search field width (Saul-style single row) */
+.sqladmin-table-search-wrap {
+  flex: 1 1 14rem;
+  max-width: 20rem;
+  min-width: 12rem;
+}
+
+.sqladmin-table-search-input {
+  width: 100%;
+}
+
+/* List: column headers (Saul customers table: fs-7 uppercase, dashed rule) */
+#kt_admin_list_table thead.sqladmin-table-head-row th {
+  vertical-align: middle;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed var(--bs-gray-300, #e4e6ef);
+  letter-spacing: 0.06em;
+  color: var(--bs-gray-500, #a1a5b7);
+}
+
+/* List: body — Saul uses fs-6 + tbody fw-semibold; extra line-height for multi-line cells */
+#kt_admin_list_table tbody td {
+  line-height: 1.55;
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+
+/* Toolbar filter dropdown (Metronic menu): scroll when many filters */
+.sqladmin-filter-menu-body {
+  max-height: min(70vh, 28rem);
+  overflow-y: auto;
+}

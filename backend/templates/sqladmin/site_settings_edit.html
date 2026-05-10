@@ -1,0 +1,80 @@
+{% extends "sqladmin/edit.html" %}
+{% from 'sqladmin/_macros.html' import render_form_fields %}
+
+{% block form_fields %}
+{{ render_form_fields(form, form_opts=form_opts, ignore_field_order=true, edit_obj=obj) }}
+{% endblock %}
+
+{% block form_fieldset_top %}
+<div class="mb-5 row align-items-start">
+  <label class="col-sm-2 col-form-label">Logo preview</label>
+  <div class="col-sm-10">
+    <div
+      class="border border-dashed border-gray-300 rounded p-4 bg-light d-inline-block text-center site-settings-logo-preview-box"
+      style="min-height: 112px; min-width: 140px"
+    >
+      <img
+        id="site-logo-admin-preview"
+        {% if obj.logo_url and obj.logo_url.strip() %}src="{{ obj.logo_url|e }}"{% endif %}
+        alt="Current logo"
+        class="site-settings-logo-preview"
+        style="max-height: 96px; max-width: 260px; object-fit: contain; {% if not obj.logo_url or not obj.logo_url.strip() %}display: none{% endif %}"
+        loading="lazy"
+      />
+      <span
+        id="site-logo-admin-preview-placeholder"
+        class="text-muted fs-7"
+        style="{% if obj.logo_url and obj.logo_url.strip() %}display: none{% endif %}"
+      >No logo yet — upload a file below.</span>
+    </div>
+    <p class="text-muted fs-8 mt-2 mb-0">Choosing a new file updates this preview before you save.</p>
+    {% if sal_site_settings_form_rev is defined %}
+    <p class="text-muted fs-9 mt-2 mb-0"><code class="fs-9">sal_site_settings_form_rev={{ sal_site_settings_form_rev }}</code></p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block tail %}
+{{ super() }}
+<script>
+(function () {
+  var img = document.getElementById("site-logo-admin-preview");
+  var ph = document.getElementById("site-logo-admin-preview-placeholder");
+  var fileInput = document.querySelector('input[type="file"][name="logo_upload"]');
+  var initialSrc = img && img.getAttribute("src") ? img.getAttribute("src") : "";
+  var blobUrl = null;
+
+  function showPreview(src) {
+    if (!img || !ph || !src) return;
+    img.src = src;
+    img.style.display = "block";
+    ph.style.display = "none";
+  }
+
+  function clearBlob() {
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      blobUrl = null;
+    }
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener("change", function () {
+      clearBlob();
+      var f = this.files && this.files[0];
+      if (f) {
+        blobUrl = URL.createObjectURL(f);
+        showPreview(blobUrl);
+      } else if (initialSrc) {
+        showPreview(initialSrc);
+      } else {
+        img.removeAttribute("src");
+        img.style.display = "none";
+        ph.style.display = "block";
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}

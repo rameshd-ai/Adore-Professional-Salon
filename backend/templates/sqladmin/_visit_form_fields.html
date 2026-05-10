@@ -1,0 +1,50 @@
+{% from 'sqladmin/_macros.html' import render_field %}
+{% macro render_visit_customer_block(form) %}
+{% if form.hidden_tag is defined %}
+{{ form.hidden_tag() }}
+{% else %}
+{% for f in form if f.widget.input_type == 'hidden' %}
+{{ f }}
+{% endfor %}
+{% endif %}
+{{ render_field(form.customer) }}
+{% if 'new_customer_full_name' in form or 'new_customer_phone' in form %}
+<div class="card border border-dashed border-gray-300 mb-5">
+  <div class="card-body py-4">
+    <div class="fw-semibold text-gray-800 mb-3">New customer <span class="text-muted fw-normal fs-7">(only if not in search)</span></div>
+    <p class="text-muted small mb-3">Phone is required here if you did not select someone above. Name is optional (saved as “Walk-in” if empty).</p>
+    {% if 'new_customer_full_name' in form %}
+    {{ render_field(form.new_customer_full_name) }}
+    {% endif %}
+    {% if 'new_customer_phone' in form %}
+    {{ render_field(form.new_customer_phone) }}
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% if 'visit_services' in form %}
+{{ render_field(form.visit_services, kwargs={"class": "visit-services-multiselect"}) }}
+<p class="text-muted small mb-4 col-sm-10 offset-sm-2">Type to search. Select multiple services; prices are shown in the list. Total fills <strong>Amount</strong> automatically.</p>
+{% endif %}
+{% if 'custom_service_name' in form %}
+{{ render_field(form.custom_service_name) }}
+{% endif %}
+{% if 'visit_date' in form %}
+{{ render_field(form.visit_date) }}
+{% endif %}
+{% if 'stylist' in form %}
+{{ render_field(form.stylist) }}
+<p class="text-muted small mb-4 col-sm-10 offset-sm-2">Add or edit names in the <strong>Stylists</strong> section of the admin menu.</p>
+{% endif %}
+{% if 'amount_charged' in form %}
+{{ render_field(form.amount_charged) }}
+<div class="row mb-4">
+  <div class="col-sm-10 offset-sm-2">
+    <span id="visit-menu-total-hint" class="fw-semibold text-gray-800 fs-6"></span>
+  </div>
+</div>
+{% endif %}
+{% if 'notes' in form %}
+{{ render_field(form.notes) }}
+{% endif %}
+{% endmacro %}

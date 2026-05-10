@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  {% set SAUL = "/saul-admin" %}
+  <link rel="stylesheet" href="{{ SAUL }}/assets/plugins/global/plugins.bundle.css" type="text/css" />
+  <link rel="stylesheet" href="{{ SAUL }}/assets/css/style.bundle.css" type="text/css" />
+  <link rel="stylesheet" href="{{ SAUL }}/assets/plugins/custom/datatables/datatables.bundle.css" type="text/css" />
+  <link rel="stylesheet" href="{{ url_for('admin:statics', path='css/fontawesome.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('admin:statics', path='css/select2.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('admin:statics', path='css/flatpickr.min.css') }}">
+  <link rel="stylesheet" href="/admin-theme/sqladmin-saul-bridge.css?v=9">
+  {% if admin.favicon_url %}
+  <link rel="icon" href="{{ admin.favicon_url }}">
+  {% else %}
+  <link rel="shortcut icon" href="{{ SAUL }}/assets/media/logos/favicon.ico">
+  {% endif %}
+  {% block head %}
+  {% endblock %}
+  <title>{{ admin.site_brand().title }} · Admin</title>
+</head>
+<body {% block body_attrs %}id="kt_app_body" class="app-default"
+  data-kt-app-header-fixed="true"
+  data-kt-app-header-fixed-mobile="true"
+  data-kt-app-sidebar-enabled="true"
+  data-kt-app-sidebar-fixed="true"
+  data-kt-app-sidebar-hoverable="true"
+  data-kt-app-sidebar-push-toolbar="true"
+  data-kt-app-sidebar-push-footer="true"
+  data-kt-app-toolbar-enabled="true"
+  data-kt-app-aside-enabled="true"
+  data-kt-app-aside-fixed="true"
+  data-kt-app-aside-push-toolbar="true"
+  data-kt-app-aside-push-footer="true"{% endblock %}>
+  {% block body %}
+  <main>
+    {% block main %}
+    {% endblock %}
+  </main>
+  {% endblock %}
+  {% set SAUL = "/saul-admin" %}
+  <script>var hostUrl = "{{ SAUL }}/";</script>
+  <script src="{{ SAUL }}/assets/plugins/global/plugins.bundle.js"></script>
+  <script src="{{ SAUL }}/assets/js/scripts.bundle.js"></script>
+  <script src="{{ SAUL }}/assets/plugins/custom/datatables/datatables.bundle.js"></script>
+  <script src="{{ SAUL }}/assets/js/widgets.bundle.js"></script>
+  <script type="text/javascript" src="{{ url_for('admin:statics', path='js/jquery.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('admin:statics', path='js/select2.full.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('admin:statics', path='js/flatpickr.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('admin:statics', path='js/main.js') }}"></script>
+  <script type="text/javascript" src="/admin-theme/sqladmin-select2-ajax-fix.js"></script>
+  {% block tail %}
+  {% endblock %}
+</body>
+</html>

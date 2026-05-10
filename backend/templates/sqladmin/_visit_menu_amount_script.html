@@ -1,0 +1,57 @@
+<script>
+(function () {
+  function parsePrice(s) {
+    if (!s) return 0;
+    var m = String(s).match(/(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?/);
+    if (!m) return 0;
+    return parseFloat(m[0].replace(/,/g, '')) || 0;
+  }
+  function formatTotal(sum, samplePrice) {
+    var sp = samplePrice || '';
+    if (sp.indexOf('₹') !== -1 || /rs\.?/i.test(sp)) return '₹' + Math.round(sum);
+    if (sp.indexOf('$') !== -1) return '$' + sum.toFixed(2);
+    return String(Math.round(sum));
+  }
+  function wire(prices) {
+    var sel = document.querySelector('select[name="visit_services"]');
+    var amt = document.querySelector('input[name="amount_charged"]');
+    var hint = document.getElementById('visit-menu-total-hint');
+    if (!sel || !amt) return;
+    function update() {
+      var opts = Array.prototype.slice.call(sel.selectedOptions || []);
+      if (!opts.length) {
+        if (hint) hint.textContent = '';
+        return;
+      }
+      var sum = 0;
+      var sample = '';
+      opts.forEach(function (o) {
+        sum += prices[o.value] || 0;
+        if (!sample && o.textContent) sample = o.textContent;
+      });
+      var fromOpt = opts[0] && opts[0].textContent ? opts[0].textContent.match(/\(([^)]+)\)\s*$/) : null;
+      var samplePrice = fromOpt ? fromOpt[1] : sample;
+      var formatted = formatTotal(sum, samplePrice);
+      amt.value = formatted;
+      if (hint) hint.textContent = 'Selected menu total: ' + formatted;
+    }
+    sel.addEventListener('change', update);
+    sel.addEventListener('click', function () { setTimeout(update, 0); });
+    if (window.jQuery) {
+      var $s = window.jQuery(sel);
+      $s.on('change.visitAmount select2:select select2:unselect', update);
+    }
+    update();
+  }
+  fetch('/api/menu')
+    .then(function (r) { return r.json(); })
+    .then(function (items) {
+      var prices = {};
+      (items || []).forEach(function (it) {
+        prices[String(it.id)] = parsePrice(it.price);
+      });
+      wire(prices);
+    })
+    .catch(function () { wire({}); });
+})();
+</script>

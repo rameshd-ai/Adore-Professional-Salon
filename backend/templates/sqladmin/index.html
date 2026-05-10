@@ -1,0 +1,146 @@
+{% extends "sqladmin/layout.html" %}
+{% set d = dashboard_stats %}
+{% block content %}
+<div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+  <div class="col-md-6 col-xl-3">
+    <div class="card h-100 border border-gray-300 border-dashed">
+      <div class="card-body d-flex flex-column justify-content-between">
+        <div class="d-flex flex-stack">
+          <span class="text-gray-600 fs-7 fw-semibold text-uppercase">Customers</span>
+          <span class="badge badge-light-primary fs-8">Total</span>
+        </div>
+        <div class="d-flex align-items-end justify-content-between mt-5">
+          <span class="fs-2hx fw-bold text-gray-900 lh-1">{{ d.customer_count }}</span>
+          <a href="{{ url_for('admin:list', identity='customer') }}" class="btn btn-sm btn-light-primary">Open list</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card h-100 border border-gray-300 border-dashed">
+      <div class="card-body d-flex flex-column justify-content-between">
+        <div class="d-flex flex-stack">
+          <span class="text-gray-600 fs-7 fw-semibold text-uppercase">Stylists</span>
+          <span class="badge badge-light-success fs-8">Active</span>
+        </div>
+        <div class="d-flex align-items-end justify-content-between mt-5">
+          <span class="fs-2hx fw-bold text-gray-900 lh-1">{{ d.stylist_active_count }}</span>
+          <a href="{{ url_for('admin:list', identity='stylist') }}" class="btn btn-sm btn-light-success">Open list</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card h-100 border border-gray-300 border-dashed">
+      <div class="card-body d-flex flex-column justify-content-between">
+        <div class="d-flex flex-stack">
+          <span class="text-gray-600 fs-7 fw-semibold text-uppercase">Customers today</span>
+          <span class="badge badge-light-warning fs-8">{{ d.as_of_date.strftime('%d %b') }}</span>
+        </div>
+        <div class="mt-5">
+          <span class="fs-2hx fw-bold text-gray-900 lh-1">{{ d.customers_seen_today }}</span>
+          <div class="text-muted fs-8 fw-semibold mt-2">{{ d.visits_today }} visit{% if d.visits_today != 1 %}s{% endif %} logged</div>
+        </div>
+        <div class="mt-5">
+          <a href="{{ url_for('admin:list', identity='customer-service-visit') }}" class="btn btn-sm btn-light-warning w-100">Service history</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card h-100 border border-gray-300 border-dashed">
+      <div class="card-body d-flex flex-column justify-content-between">
+        <div class="d-flex flex-stack">
+          <span class="text-gray-600 fs-7 fw-semibold text-uppercase">Sales today</span>
+          <span class="badge badge-light-info fs-8">{{ d.as_of_date.strftime('%d %b') }}</span>
+        </div>
+        <div class="d-flex align-items-end justify-content-between mt-5">
+          <span class="fs-2hx fw-bold text-gray-900 lh-1">{{ d.today_sales_display }}</span>
+        </div>
+        <div class="text-muted fs-8 fw-semibold mt-3">Sum of amounts on visits dated today.</div>
+        <div class="mt-5">
+          <a href="{{ url_for('admin:list', identity='customer-service-visit') }}" class="btn btn-sm btn-light-info w-100">Service history</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+  <div class="col-xl-6">
+    <div class="card card-flush h-xl-100 border border-gray-300 border-dashed">
+      <div class="card-header pt-7">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bold text-gray-900">Customers per day</span>
+          <span class="text-muted mt-1 fw-semibold fs-7">Distinct customers with a visit (last 14 days)</span>
+        </h3>
+      </div>
+      <div class="card-body pt-0 pb-4">
+        <div id="dashboard-chart-daily-customers" style="min-height: 300px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6">
+    <div class="card card-flush h-xl-100 border border-gray-300 border-dashed">
+      <div class="card-header pt-7">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bold text-gray-900">Customers per week</span>
+          <span class="text-muted mt-1 fw-semibold fs-7">Distinct customers with a visit (Mon–Sun weeks, last 12)</span>
+        </h3>
+      </div>
+      <div class="card-body pt-0 pb-4">
+        <div id="dashboard-chart-weekly-customers" style="min-height: 300px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="text-muted fs-7 mb-0">“Today” and charts use each visit’s <strong>visit date</strong> (server calendar).</p>
+{% endblock %}
+
+{% block tail %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2/dist/apexcharts.min.js" crossorigin="anonymous"></script>
+<script>
+(function () {
+  var dailyLabels = {{ d.daily_customer_chart_labels | list | tojson }};
+  var dailyVals = {{ d.daily_customer_chart_values | list | tojson }};
+  var weeklyLabels = {{ d.weekly_customer_chart_labels | list | tojson }};
+  var weeklyVals = {{ d.weekly_customer_chart_values | list | tojson }};
+
+  var common = {
+    chart: { fontFamily: 'inherit', toolbar: { show: false }, zoom: { enabled: false } },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 2 },
+    grid: { strokeDashArray: 4, borderColor: '#E4E6EF' },
+    colors: ['#7239EA'],
+    tooltip: { theme: 'light', y: { formatter: function (v) { return (v == null ? '' : Math.round(v)) + ' customers'; } } },
+  };
+
+  var elD = document.querySelector('#dashboard-chart-daily-customers');
+  if (elD && typeof ApexCharts !== 'undefined') {
+    new ApexCharts(elD, Object.assign({}, common, {
+      chart: Object.assign({ type: 'area', height: 300 }, common.chart),
+      series: [{ name: 'Customers', data: dailyVals }],
+      xaxis: { categories: dailyLabels, labels: { style: { colors: '#A1A5B7', fontSize: '11px' } } },
+      yaxis: { min: 0, labels: { style: { colors: '#A1A5B7', fontSize: '11px' } }, tickAmount: 5 },
+      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.05 } },
+    })).render();
+  }
+
+  var elW = document.querySelector('#dashboard-chart-weekly-customers');
+  if (elW && typeof ApexCharts !== 'undefined') {
+    new ApexCharts(elW, Object.assign({}, common, {
+      chart: Object.assign({ type: 'bar', height: 300 }, common.chart),
+      series: [{ name: 'Customers', data: weeklyVals }],
+      xaxis: {
+        categories: weeklyLabels,
+        labels: { rotate: -35, rotateAlways: true, style: { colors: '#A1A5B7', fontSize: '10px' } },
+      },
+      yaxis: { min: 0, labels: { style: { colors: '#A1A5B7', fontSize: '11px' } }, tickAmount: 5 },
+      plotOptions: { bar: { borderRadius: 4, columnWidth: '62%' } },
+    })).render();
+  }
+})();
+</script>
+{% endblock %}

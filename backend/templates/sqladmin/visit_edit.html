@@ -1,0 +1,50 @@
+{% extends "sqladmin/layout.html" %}
+{% from 'sqladmin/_visit_form_fields.html' import render_visit_customer_block %}
+{% block content %}
+<div class="col-12">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Edit {{ model_view.name }}</h3>
+    </div>
+    <div class="card-body border-bottom py-3">
+      <form action="{{ model_view._build_url_for('admin:edit', request, obj) }}" method="POST"
+        enctype="multipart/form-data">
+        <div class="row">
+          {% if error %}
+          <div class="alert alert-danger" role="alert">{{ error }}</div>
+          {% endif %}
+        </div>
+        <fieldset class="form-fieldset">
+          {{ render_visit_customer_block(form) }}
+        </fieldset>
+        <div class="row mt-6 align-items-center">
+          <div class="col-md-2">
+            <a href="{{ url_for('admin:list', identity=model_view.identity) }}" class="btn btn-light">
+              Cancel
+            </a>
+          </div>
+          <div class="col-md-10">
+            <div class="btn-group flex-wrap gap-2" role="group">
+              <input type="submit" name="save" value="Save" class="btn btn-primary">
+              <input type="submit" name="save" value="Save and continue editing" class="btn btn-light-primary">
+              {% if model_view.can_create %}
+              {% if model_view.save_as %}
+              <input type="submit" name="save" value="Save as new" class="btn btn-light-primary">
+              {% else %}
+              <input type="submit" name="save" value="Save and add another" class="btn btn-light-primary">
+              {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block tail %}
+{{ super() }}
+{% include 'sqladmin/_visit_services_select2.html' %}
+{% include 'sqladmin/_visit_menu_amount_script.html' %}
+{% endblock %}

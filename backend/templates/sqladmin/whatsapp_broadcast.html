@@ -1,0 +1,129 @@
+{% extends "sqladmin/layout.html" %}
+{% block content %}
+<div class="col-12 col-xl-10">
+  <div class="card mb-5">
+    <div class="card-header border-0 pt-6">
+      <h3 class="card-title align-items-start flex-column">
+        <span class="card-label fw-bold fs-3 mb-1">Send WhatsApp</span>
+        <span class="text-muted mt-1 fw-semibold fs-7">Choose customers, add text and optionally an image link (public https URL).</span>
+      </h3>
+      <div class="card-toolbar d-flex flex-wrap gap-2">
+        <a href="{{ url_for('admin:list', identity='whats-app-inbox-message') }}" class="btn btn-sm btn-light">
+          Inbox
+        </a>
+        <a href="{{ url_for('admin:edit', identity='api-settings', pk='1') }}" class="btn btn-sm btn-light-primary">
+          API settings
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      {% if not api_configured %}
+      <div class="alert alert-warning d-flex align-items-center mb-6" role="alert">
+        <i class="fa fa-exclamation-triangle me-3 fs-3"></i>
+        <div>
+          WhatsApp is not ready. Open <strong>API → API settings</strong>, turn on <em>WhatsApp enabled</em>, and paste your
+          <strong>access token</strong> and <strong>phone number ID</strong> from the Meta developer console.
+        </div>
+      </div>
+      {% endif %}
+
+      {% if error_msg %}
+      <div class="alert alert-danger mb-6" role="alert">{{ error_msg }}</div>
+      {% endif %}
+
+      {% if results %}
+      <div class="mb-8">
+        <h4 class="fs-5 fw-bold mb-4">Results</h4>
+        <div class="table-responsive">
+          <table class="table table-row-bordered table-row-gray-300 align-middle gs-0 gy-4">
+            <thead>
+              <tr class="fw-bold text-muted">
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Detail</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in results %}
+              <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.phone }}</td>
+                <td>
+                  {% if row.ok %}
+                  <span class="badge badge-light-success">OK</span>
+                  {% else %}
+                  <span class="badge badge-light-danger">Failed</span>
+                  {% endif %}
+                </td>
+                <td class="text-muted fs-7">{{ row.detail }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('admin:whatsapp_broadcast') }}">
+        <div class="mb-6">
+          <label class="form-label required fw-semibold" for="wb-customers">Customers</label>
+          <select name="customer_ids" id="wb-customers" class="form-select" multiple
+            data-placeholder="Search and select customers" {% if not api_configured %}disabled{% endif %}>
+            {% for r in recipient_rows %}
+            <option value="{{ r.id }}">{{ r.label }}</option>
+            {% endfor %}
+          </select>
+          {% if recipient_rows|length == 0 %}
+          <div class="text-muted fs-7 mt-2">No active customers with a phone number. Add phones on customer records first.</div>
+          {% else %}
+          <div class="text-muted fs-7 mt-2">Only customers with a saved phone appear here. Hold Ctrl/Cmd to multi-select, or use the search box.</div>
+          {% endif %}
+          <p class="text-muted fs-7 mt-3 mb-0">
+            Incoming customer replies are saved under <strong>WhatsApp → WhatsApp inbox</strong> when your Meta webhook points to
+            <code class="user-select-all">/webhooks/whatsapp</code> (set the same verify token in <strong>API → API settings</strong>).
+          </p>
+        </div>
+
+        <div class="mb-6">
+          <label class="form-label fw-semibold" for="wb-message">Message</label>
+          <textarea class="form-control" name="message" id="wb-message" rows="6"
+            placeholder="Offer text, appointment reminder, etc."
+            {% if not api_configured %}disabled{% endif %}></textarea>
+          <div class="form-text">If you add an image URL below, this text is sent as the image caption (when supported).</div>
+        </div>
+
+        <div class="mb-8">
+          <label class="form-label fw-semibold" for="wb-image">Image URL (optional)</label>
+          <input type="url" class="form-control" name="image_url" id="wb-image"
+            placeholder="https://example.com/promo.jpg"
+            {% if not api_configured %}disabled{% endif %} />
+          <div class="form-text">Must be a reachable <strong>https</strong> link; WhatsApp downloads the file from that URL.</div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-3">
+          <button type="submit" class="btn btn-primary" {% if not api_configured or recipient_rows|length == 0 %}disabled{% endif %}>
+            Send
+          </button>
+          <a href="{{ url_for('admin:list', identity='customer') }}" class="btn btn-light">Customers</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block tail %}
+{{ super() }}
+<script>
+(function () {
+  var el = document.getElementById('wb-customers');
+  if (!el || typeof jQuery === 'undefined' || !jQuery.fn.select2) return;
+  jQuery(el).select2({
+    width: '100%',
+    placeholder: el.getAttribute('data-placeholder') || 'Select customers',
+    closeOnSelect: false
+  });
+})();
+</script>
+{% endblock %}

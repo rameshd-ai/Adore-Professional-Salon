@@ -1,0 +1,171 @@
+{% macro menu_category(menu, request) %}
+{# Hide accordion headings when every child is hidden (e.g. API category after moving settings to Site). #}
+{% set ns = namespace(any_child=false) %}
+{% for sub_menu in menu.children %}
+{% if sub_menu.is_visible(request) and sub_menu.is_accessible(request) %}
+{% set ns.any_child = true %}
+{% endif %}
+{% endfor %}
+{% if ns.any_child and menu.is_visible(request) and menu.is_accessible(request) %}
+<div data-kt-menu-trigger="click" class="menu-item menu-accordion{% if menu.is_active(request) %} here show{% endif %}">
+  <span class="menu-link{% if menu.is_active(request) %} active{% endif %}">
+    <span class="menu-icon">
+      {% if menu.icon %}<i class="{{ menu.icon }} fs-2"></i>{% endif %}
+    </span>
+    <span class="menu-title">{{ menu.display_name }}</span>
+    <span class="menu-arrow"></span>
+  </span>
+  <div class="menu-sub menu-sub-accordion">
+    {% for sub_menu in menu.children %}
+    {% if sub_menu.is_visible(request) and sub_menu.is_accessible(request) %}
+    <div class="menu-item">
+      <a class="menu-link{% if sub_menu.is_active(request) %} active{% endif %}" href="{{ sub_menu.url(request) }}">
+        <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+        <span class="menu-title">{{ sub_menu.display_name }}</span>
+      </a>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro menu_item(menu, request) %}
+{% if menu.is_visible(request) and menu.is_accessible(request) %}
+<div class="menu-item">
+  <a class="menu-link{% if menu.is_active(request) %} active{% endif %}" href="{{ menu.url(request) }}">
+    <span class="menu-icon">
+      {% if menu.icon %}<i class="{{ menu.icon }} fs-2"></i>{% endif %}
+    </span>
+    <span class="menu-title">{{ menu.display_name }}</span>
+  </a>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro display_menu(menu, request) %}
+<div id="kt_app_sidebar_menu" class="menu menu-column menu-rounded menu-active-bg menu-sub-indention" data-kt-menu="true" data-kt-menu-expand="false">
+  {% for item in menu.items %}
+  {% if item.type_ == "View" %}
+  {{ menu_item(item, request) }}
+  {% elif item.type_ == "Category" %}
+  {{ menu_category(item, request) }}
+  {% endif %}
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro render_field(field, kwargs={}, edit_obj=none) %}
+{# SQLAdmin default only added form-control on error — unstyled inputs otherwise. #}
+{% set inv = ' is-invalid' if field.errors else '' %}
+{% set _upload_saved_col = {
+  'logo_upload': 'logo_url',
+  'about_main_upload': 'about_main_image',
+  'about_secondary_upload': 'about_secondary_image',
+  'menu_preview_upload': 'menu_preview_image',
+  'cta_bg_upload': 'cta_bg_image',
+  'image_upload': 'image_url',
+  'upload': 'image_url',
+  'background_upload': 'background_image',
+} %}
+{% if field.type == 'BooleanField' %}
+<div class="mb-3 row align-items-center">
+  {{ field.label(
+    class_="col-sm-2 col-form-label" + (' required-label' if field.flags.required else ''),
+    **({'title': "This is a required field"} if field.flags.required else {})
+  ) }}
+  <div class="col-sm-10">
+    <div class="form-check form-check-custom form-check-solid form-check-sm pt-1">
+      {{ field(class_="form-check-input" + inv) }}
+    </div>
+    {% for error in field.errors %}
+    <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endfor %}
+    {% if field.description %}
+    <small class="text-muted d-block mt-1">{{ field.description }}</small>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+<div class="mb-3 row">
+  {{ field.label(
+    class_="col-sm-2 col-form-label" + (' required-label' if field.flags.required else ''),
+    **({'title': "This is a required field"} if field.flags.required else {})
+  ) }}
+  <div class="col-sm-10">
+    {% if field.type == 'FileField' and edit_obj is not none and field.name in _upload_saved_col %}
+    {% set cur = admin_model_attr(edit_obj, _upload_saved_col[field.name]) %}
+    {% if cur %}
+    <div class="mb-2 fs-8 text-muted">
+      Current file:
+      <code class="text-gray-800 user-select-all" title="{{ cur|e }}">{% if '/' in cur %}{{ cur.rsplit('/', 1)[-1] }}{% else %}{{ cur }}{% endif %}</code>
+    </div>
+    {% endif %}
+    {% endif %}
+    {# WTForms widgets.Select has no input_type (only Input subclasses do). #}
+    {% set is_select_field = field.widget.__class__.__name__ == 'Select' %}
+    {% if is_select_field %}
+    {% set sel_more = kwargs.get('class', '') %}
+    {{ field(class_=('form-select ' + sel_more).strip() + inv) }}
+    {% else %}
+    {{ field(class_="form-control" + inv) }}
+    {% endif %}
+    {% for error in field.errors %}
+    <div class="invalid-feedback">{{ error }}</div>
+    {% endfor %}
+    {% if field.description %}
+    <small class="text-muted d-block mt-2">{{ field.description }}</small>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro render_form_fields(form, form_opts=None, field_order=None, ignore_field_order=false, edit_obj=none) %}
+{% if form.hidden_tag is defined %}
+{{ form.hidden_tag() }}
+{% else %}
+{% for f in form %}
+{% if f.widget.input_type is defined and f.widget.input_type == 'hidden' %}
+{{ f }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{# When ``field_order`` is set (SQLAdmin ``form_rules``), render in that order.
+   Site settings passes ``ignore_field_order=true`` so WTForms class field order wins. #}
+{% set use_order = not ignore_field_order and field_order is not none and field_order|length > 0 %}
+{% if use_order %}
+{% for name in field_order %}
+{% if name is string and name in form %}
+{% set f = form[name] %}
+{% if f.widget.input_type is not defined or f.widget.input_type != 'hidden' %}
+{{ render_field(f, kwargs=form_opts or {}, edit_obj=edit_obj) }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% for f in form %}
+{% if f.name not in field_order %}
+{% if f.widget.input_type is defined %}
+{% if f.widget.input_type != 'hidden' %}
+{{ render_field(f, kwargs=form_opts or {}, edit_obj=edit_obj) }}
+{% endif %}
+{% else %}
+{{ render_field(f, kwargs=form_opts or {}, edit_obj=edit_obj) }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% else %}
+{# TextArea / Select widgets have no input_type; comparing Undefined != 'hidden' is false in Jinja and hid those fields. #}
+{% for f in form %}
+{% if f.widget.input_type is defined %}
+{% if f.widget.input_type != 'hidden' %}
+{{ render_field(f, kwargs=form_opts or {}, edit_obj=edit_obj) }}
+{% endif %}
+{% else %}
+{{ render_field(f, kwargs=form_opts or {}, edit_obj=edit_obj) }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endmacro %}

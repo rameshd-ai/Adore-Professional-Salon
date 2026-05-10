@@ -1,0 +1,47 @@
+{% extends "sqladmin/layout.html" %}
+{% from 'sqladmin/_macros.html' import render_form_fields %}
+{% block content %}
+<div class="col-12">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Edit {{ model_view.name }}</h3>
+    </div>
+    <div class="card-body border-bottom py-3">
+      <form action="{{ model_view._build_url_for('admin:edit', request, obj) }}" method="POST"
+        enctype="multipart/form-data">
+        <div class="row">
+          {% if error %}
+          <div class="alert alert-danger" role="alert">{{ error }}</div>
+          {% endif %}
+        </div>
+        <fieldset class="form-fieldset">
+          {% block form_fieldset_top %}{% endblock %}
+          {% block form_fields %}
+          {{ render_form_fields(form, form_opts=form_opts, field_order=model_view._form_edit_rules, edit_obj=obj) }}
+          {% endblock %}
+        </fieldset>
+        <div class="row mt-6 align-items-center">
+          <div class="col-md-2">
+            <a href="{{ url_for('admin:list', identity=model_view.identity) }}" class="btn btn-light">
+              Cancel
+            </a>
+          </div>
+          <div class="col-md-10">
+            <div class="btn-group flex-wrap gap-2" role="group">
+              <input type="submit" name="save" value="Save" class="btn btn-primary">
+              <input type="submit" name="save" value="Save and continue editing" class="btn btn-light-primary">
+              {% if model_view.can_create %}
+              {% if model_view.save_as %}
+              <input type="submit" name="save" value="Save as new" class="btn btn-light-primary">
+              {% else %}
+              <input type="submit" name="save" value="Save and add another" class="btn btn-light-primary">
+              {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
