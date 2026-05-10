@@ -7,10 +7,9 @@ import {
   getServiceCategories,
   getServices,
   getTestimonials,
-  postBooking,
 } from '../api'
 import SmartLink from '../SmartLink'
-import { DEFAULT_SALON_NAME } from '../defaultBrand'
+import { DEFAULT_SALON_NAME, displayHoursLine, displayPhone, phoneTelHref } from '../defaultBrand'
 import { categoryAnchorId, groupServicesByCategory, placeholderServiceImage } from '../serviceCategories'
 
 function useBootstrapCarousel(id, count) {
@@ -33,14 +32,6 @@ export default function Home() {
   const [gallery, setGallery] = useState([])
   const [posts, setPosts] = useState([])
   const [testimonials, setTestimonials] = useState([])
-  const [booking, setBooking] = useState({
-    name: '',
-    phone: '',
-    service: '',
-    preferred_date: '',
-  })
-  const [bookingMsg, setBookingMsg] = useState(null)
-
   useEffect(() => {
     Promise.all([
       getHeroSlides().then(setSlides),
@@ -54,23 +45,6 @@ export default function Home() {
 
   useBootstrapCarousel('heroCarousel', slides.length)
   useBootstrapCarousel('testimonialCarousel', testimonials.length)
-
-  async function onBookingSubmit(e) {
-    e.preventDefault()
-    setBookingMsg(null)
-    try {
-      await postBooking({
-        name: booking.name,
-        phone: booking.phone,
-        service: booking.service,
-        preferred_date: booking.preferred_date || null,
-      })
-      setBookingMsg({ ok: true, text: 'Thanks — we will contact you shortly.' })
-      setBooking({ name: '', phone: '', service: '', preferred_date: '' })
-    } catch (err) {
-      setBookingMsg({ ok: false, text: err.message || 'Could not send booking.' })
-    }
-  }
 
   const groupedServices = groupServicesByCategory(services)
   const categoryMetaByName = useMemo(() => {
@@ -140,7 +114,7 @@ export default function Home() {
                           <div className="d-flex flex-wrap align-items-center gap-4 mt-5">
                             {s.primary_button_label && (
                               <SmartLink
-                                href={s.primary_button_url?.trim() || '/contact'}
+                                href={s.primary_button_url?.trim() || phoneTelHref(settings)}
                                 className="btn btn-outline-light rounded-pill px-4 py-3 d-flex align-items-center gap-2 group-hover-btn"
                               >
                                 <span className="text-uppercase letter-spacing-1 fs-7 fw-medium">
@@ -193,7 +167,7 @@ export default function Home() {
                             )}
                             {s.secondary_button_label && (
                               <SmartLink
-                                href={s.secondary_button_url?.trim() || '/contact'}
+                                href={s.secondary_button_url?.trim() || phoneTelHref(settings)}
                                 className="btn btn-outline-light rounded-pill px-4 py-3"
                               >
                                 {s.secondary_button_label}
@@ -368,73 +342,21 @@ export default function Home() {
           </span>
           <h2 className="display-4 font-heading fw-bold text-white mb-4">Ready for a New Look?</h2>
           <p className="text-white-50 mb-5 mx-auto" style={{ maxWidth: 600 }}>
-            Book your appointment today and let our expert stylists transform your hair.
+            Call us to book your appointment — our team will find a time that works for you.
           </p>
-          <form
-            className="booking-form bg-white p-4 p-lg-5 mx-auto rounded-0 shadow"
-            style={{ maxWidth: 800 }}
-            onSubmit={onBookingSubmit}
+          <div
+            className="booking-call-card bg-white p-4 p-lg-5 mx-auto rounded-0 shadow text-center"
+            style={{ maxWidth: 520 }}
           >
-            {bookingMsg && (
-              <div
-                className={`alert ${bookingMsg.ok ? 'alert-success' : 'alert-danger'} rounded-0 mb-3`}
-                role="alert"
-              >
-                {bookingMsg.text}
-              </div>
-            )}
-            <div className="row g-3">
-              <div className="col-md-4">
-                <input
-                  required
-                  className="form-control rounded-0 py-3 bg-light border-0"
-                  placeholder="Your Name"
-                  value={booking.name}
-                  onChange={(e) => setBooking((b) => ({ ...b, name: e.target.value }))}
-                />
-              </div>
-              <div className="col-md-4">
-                <input
-                  required
-                  type="tel"
-                  className="form-control rounded-0 py-3 bg-light border-0"
-                  placeholder="Phone Number"
-                  value={booking.phone}
-                  onChange={(e) => setBooking((b) => ({ ...b, phone: e.target.value }))}
-                />
-              </div>
-              <div className="col-md-4">
-                <select
-                  className="form-select rounded-0 py-3 bg-light border-0"
-                  value={booking.service}
-                  onChange={(e) => setBooking((b) => ({ ...b, service: e.target.value }))}
-                >
-                  <option value="">Select Service</option>
-                  {services.map((s) => (
-                    <option key={s.id} value={s.title}>
-                      {s.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-6">
-                <input
-                  type="date"
-                  className="form-control rounded-0 py-3 bg-light border-0"
-                  value={booking.preferred_date}
-                  onChange={(e) => setBooking((b) => ({ ...b, preferred_date: e.target.value }))}
-                />
-              </div>
-              <div className="col-md-6">
-                <button
-                  type="submit"
-                  className="btn btn-primary w-100 rounded-0 py-3 text-uppercase letter-spacing-1 fw-medium"
-                >
-                  Book Now
-                </button>
-              </div>
-            </div>
-          </form>
+            <a
+              href={phoneTelHref(settings)}
+              className="btn btn-primary w-100 rounded-0 py-3 text-uppercase letter-spacing-1 fw-medium"
+            >
+              <i className="bi bi-telephone me-2" aria-hidden />
+              Call {displayPhone(settings)}
+            </a>
+            <p className="text-secondary small mt-3 mb-0">{displayHoursLine(settings)}</p>
+          </div>
         </div>
       </section>
 

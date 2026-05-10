@@ -17,6 +17,13 @@ export function displayPhone(settings) {
   return (settings?.phone || '').trim() || DEFAULT_PHONE
 }
 
+/** `tel:` href — strips spaces; keeps leading `+` for international numbers. */
+export function phoneTelHref(settings) {
+  const display = displayPhone(settings)
+  const cleaned = display.replace(/[^\d+]/g, '')
+  return cleaned ? `tel:${cleaned}` : `tel:${DEFAULT_PHONE.replace(/[^\d+]/g, '')}`
+}
+
 export function displayEmail(settings) {
   return (settings?.email || '').trim() || DEFAULT_EMAIL
 }

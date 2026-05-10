@@ -137,8 +137,8 @@ export default function MenuPage() {
             </span>
             <h1 className="display-5 font-heading fw-bold mb-2">Treatments &amp; prices</h1>
             <p className="text-secondary mb-0">
-              Browse by category — each row lists the service, details, and price. Book via Contact when you
-              are ready.
+              Browse by category — each row lists the service, details, and price. Call us when you&apos;re
+              ready to book.
             </p>
           </div>
         </div>

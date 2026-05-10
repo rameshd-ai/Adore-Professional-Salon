@@ -9,9 +9,8 @@ import {
   displayEmail,
   displayHoursLine,
   displayPhone,
+  phoneTelHref,
 } from './defaultBrand'
-import SmartLink from './SmartLink'
-
 /** When the API is down, still render the shell so navigation and pages work. */
 const FALLBACK_SETTINGS = {
   salon_name: DEFAULT_SALON_NAME,
@@ -123,9 +122,9 @@ export default function Layout() {
               className="me-2"
               dangerouslySetInnerHTML={{ __html: settings.discount_banner_html }}
             />
-            <SmartLink href="/contact" className="fw-bold">
+            <a href={phoneTelHref(settings)} className="fw-bold text-decoration-underline">
               {settings.discount_book_link_label || 'Book Now'}
-            </SmartLink>
+            </a>
             <button
               type="button"
               className="btn-close shadow-none top-50 translate-middle-y me-3"
@@ -249,13 +248,13 @@ export default function Layout() {
                     </NavLink>
                   </li>
                   <li className="nav-item ms-lg-3">
-                    <NavLink
-                      to="/contact"
+                    <a
+                      href={phoneTelHref(settings)}
                       className="btn btn-primary btn-book rounded-0 px-4 py-2"
                       onClick={dismissNavbarOffcanvas}
                     >
                       Book Now
-                    </NavLink>
+                    </a>
                   </li>
                 </ul>
               </div>
