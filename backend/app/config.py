@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     )
     # Set DEBUG=1 in .env to return exception details on /api/* 500 responses.
     debug: bool = False
+    # If true, skip Essence remote catalog sync entirely (hair/skin prices stay DB-only).
+    skip_essence_catalog_sync: bool = False
 
 
 @lru_cache

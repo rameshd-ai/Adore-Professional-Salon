@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import traceback
 from contextlib import asynccontextmanager
@@ -27,6 +28,17 @@ from app.site_media import ensure_placeholder_asset
 from app.upload_storage import ensure_upload_root
 
 
+def _essence_catalog_sync_job() -> None:
+    """Runs in a worker thread; uses its own DB session."""
+    db = SessionLocal()
+    try:
+        sync_essence_hair_skin_services(db)
+    except Exception:
+        logging.getLogger(__name__).exception("Essence catalog sync failed")
+    finally:
+        db.close()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
@@ -37,7 +49,11 @@ async def lifespan(app: FastAPI):
     try:
         migrate_legacy_service_categories(db)
         seed_if_empty(db)
-        sync_essence_hair_skin_services(db)
+        # Essence fetch is blocking HTTP (long timeouts). Run after bind so health checks pass.
+        if not s.skip_essence_catalog_sync:
+            app.state.essence_sync_task = asyncio.create_task(
+                asyncio.to_thread(_essence_catalog_sync_job)
+            )
         ensure_nails_category_and_services(db)
         ensure_body_category_and_services(db)
         ensure_mani_pedi_category_and_services(db)
@@ -46,6 +62,12 @@ async def lifespan(app: FastAPI):
     finally:
         db.close()
     yield
+    task = getattr(app.state, "essence_sync_task", None)
+    if task is not None:
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
 
 
 _BACKEND_ROOT = Path(__file__).resolve().parent.parent
