@@ -99,7 +99,7 @@ This keeps the API running after logout/reboot. It listens on **`127.0.0.1:8000`
 
 ### Before you start
 
-1. **`$APP/backend/.env` exists** (§6) — at least `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SESSION_SECRET`, and `CORS_ORIGINS` for your real site URL. SQLite: leave `DATABASE_URL` unset.
+1. **`$APP/backend/.env`** (§6) — create it for production with at least `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SESSION_SECRET`, and `CORS_ORIGINS` for your real site URL. SQLite: leave `DATABASE_URL` unset. The unit file uses **`EnvironmentFile=-...`** so a **missing** `.env` no longer crashes systemd (you should still add `.env` before going live).
 2. **Manual check** (proves venv + app work):
 
    ```bash
@@ -134,7 +134,7 @@ Type=simple
 User=www-data
 Group=www-data
 WorkingDirectory=/opt/glamr/app/backend
-EnvironmentFile=/opt/glamr/app/backend/.env
+EnvironmentFile=-/opt/glamr/app/backend/.env
 ExecStart=/opt/glamr/app/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --proxy-headers
 Restart=always
 RestartSec=5
