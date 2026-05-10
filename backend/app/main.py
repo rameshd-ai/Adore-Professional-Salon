@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from starlette.staticfiles import StaticFiles
 
 from app.admin_setup import mount_admin
@@ -106,6 +106,13 @@ app.add_middleware(
 app.include_router(api_router, prefix="/api")
 app.include_router(whatsapp_webhook_router, prefix="/webhooks")
 mount_admin(app)
+
+
+@app.get("/admin", include_in_schema=False)
+async def admin_redirect_no_trailing_slash() -> RedirectResponse:
+    """SQLAdmin is mounted at ``/admin/``; bare ``/admin`` otherwise falls through to the SPA catch-all."""
+    return RedirectResponse(url="/admin/", status_code=307)
+
 
 _log = logging.getLogger("sal.errors")
 
