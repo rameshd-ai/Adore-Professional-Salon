@@ -53,14 +53,14 @@ export function mapEmbedSrc(settings) {
   const key = googleMapsEmbedKey()
 
   if (key) {
-    const base = 'https://www.google.com/maps/embed/v1/place'
     const k = encodeURIComponent(key)
+    // ``place`` opens a business/details sidebar — often shows “Place info couldn't load”. Prefer ``view`` / ``search``.
     if (lat && lng) {
-      const q = encodeURIComponent(`${lat},${lng}`)
-      return `${base}?key=${k}&q=${q}&zoom=16`
+      const center = encodeURIComponent(`${lat},${lng}`)
+      return `https://www.google.com/maps/embed/v1/view?key=${k}&center=${center}&zoom=16`
     }
     const q = encodeURIComponent(displayAddress(settings))
-    return `${base}?key=${k}&q=${q}&zoom=16`
+    return `https://www.google.com/maps/embed/v1/search?key=${k}&q=${q}`
   }
 
   const tail = '&z=16&hl=en&output=embed&iwloc=near'
