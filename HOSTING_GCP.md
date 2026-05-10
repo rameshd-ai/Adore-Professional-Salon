@@ -221,7 +221,17 @@ Certbot will adjust the server block for TLS. Renewals are automatic via systemd
 
 ## 12. Updates and backups
 
-**Deploy new code:**
+**Deploy new code (recommended):** from the app directory (repo root — the folder that contains `backend/` and `frontend/`), after `git pull`:
+
+```bash
+chmod +x scripts/deploy-vm.sh   # once per clone
+git pull
+./scripts/deploy-vm.sh
+```
+
+The script installs backend deps, builds the SPA, rsyncs `dist/` to `/var/www/glamr`, and restarts `glamr-api`. Override paths if needed: `WEBROOT=/var/www/glamr SYSTEMD_SERVICE=glamr-api ./scripts/deploy-vm.sh`.
+
+**Manual equivalent:**
 
 ```bash
 export APP=/opt/glamr/app
