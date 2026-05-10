@@ -11,6 +11,10 @@ Full VM setup (nginx, TLS, systemd, first venv, `.env`) is in **`HOSTING_GCP.md`
 3. `sudo rsync` of `frontend/dist/` → `/var/www/glamr/` (default)
 4. `sudo systemctl restart glamr-api` (default service name)
 
+**Google Maps (Contact page):** create **`frontend/.env`** on the VM (not in Git) with  
+`VITE_GOOGLE_MAPS_EMBED_KEY=your_key`  
+then run the deploy script so `npm run build` picks it up. Copy from **`frontend/.env.example`**.
+
 **Overrides** (if your paths differ):
 
 ```bash
