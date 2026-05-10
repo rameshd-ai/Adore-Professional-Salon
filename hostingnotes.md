@@ -57,6 +57,12 @@ sudo journalctl -u glamr-api -n 50 --no-pager
 
 ---
 
+## Admin URL
+
+Use **`/admin/`** (trailing slash) or **`/admin/login`**. Plain **`/admin`** without a slash used to show a blank page (SPA catch-all); the app and nginx config redirect it to **`/admin/`**.
+
+---
+
 ## Repo files related to hosting
 
 | Item | Role |

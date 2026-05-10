@@ -256,6 +256,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # ``/admin`` alone is not routed to SQLAdmin (mount is ``/admin/...``); keep this or the SPA serves a blank tab.
     location = /admin {
         return 308 /admin/;
     }

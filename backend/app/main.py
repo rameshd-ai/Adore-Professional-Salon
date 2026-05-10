@@ -107,12 +107,11 @@ app.include_router(api_router, prefix="/api")
 app.include_router(whatsapp_webhook_router, prefix="/webhooks")
 mount_admin(app)
 
-
+# Bare ``/admin`` does not match Starlette's Mount("/admin") (needs ``/admin/...``).
+# Without this, ``/admin`` hits the SPA ``/{full_path}`` route → blank page in a new tab.
 @app.get("/admin", include_in_schema=False)
 async def admin_redirect_no_trailing_slash() -> RedirectResponse:
-    """SQLAdmin is mounted at ``/admin/``; bare ``/admin`` otherwise falls through to the SPA catch-all."""
     return RedirectResponse(url="/admin/", status_code=307)
-
 
 _log = logging.getLogger("sal.errors")
 
